@@ -42,11 +42,24 @@ export const fetchData = () => async (dispatch) => {
     dispatch({ type: FETCH_DATA_FAILURE, payload: error.message });
   }
 };
+export const fetchItem = () => async (dispatch) => {
+  dispatch({ type: FETCH_DATA_REQUEST });
+  try {
+    const response = await axios.get('http://localhost:8080/user/${Id}');
+    dispatch({ type: FETCH_DATA_SUCCESS, payload: response.data.data,message: "Data Fetched successfully"});
+    console.log(response);
+  } catch (error) {
+    dispatch({ type: FETCH_DATA_FAILURE, payload: error.message });
+  }
+};
 
 export const editItem = (item) => async (dispatch) => {
   try {
-    const response = await axios.put(`http://localhost:8080/users/${item.Id}`, item);
+    console.log(item);
+    const response = await axios.put(`http://localhost:8080/users/${item.id}`, item);
+    
     dispatch({ type: EDIT_ITEM_SUCCESS, payload: response.data, message: response.data.message});
+    return response.data;
   } catch (error) {
     console.error(error);
   }
@@ -66,9 +79,11 @@ export const addItem = (item) => async (dispatch) => {
     const response = await axios.post('http://localhost:8080/users', item);
    if(response.data.success===true){
      dispatch({ type: ADD_ITEM_SUCCESS, payload: response.data,  message:response.data.message  });
+     return response.data;
     }
     else{
-      dispatch({ type:SET_ERROR_MESSAGE, payload: 'Failed to add item',  message:response.data.message  });
+      dispatch({ type:SET_ERROR_MESSAGE, payload: response.data.message,  message:response.data.message  });
+      return response.data;
     }
    // dispatch({ type: SET_SUCCESS_MESSAGE, payload: 'Item added successfully' }); 
   } catch (error) {
